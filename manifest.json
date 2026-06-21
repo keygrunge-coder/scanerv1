@@ -1,0 +1,17 @@
+{
+  "name": "Pusat Komando Packing V5",
+  "short_name": "Komando V5",
+  "description": "Scanner Paket Keluar SekarFootwear",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#003399",
+  "theme_color": "#003399",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3045/3045479.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
