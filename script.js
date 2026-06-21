@@ -1,18 +1,58 @@
-// script.js
-window.onload = function() { startCamera(); muatDataDashboardAwal(); };
+// Inisialisasi variabel global
 let html5QrCode = null;
-let isProcessing = false;
-let localData = JSON.parse(localStorage.getItem('harian_offline_cache')) || [];
-document.getElementById('local-slot').innerText = localData.length;
-let scanHistory = JSON.parse(localStorage.getItem("scanHistory") || "[]");
-renderHistory();
 
-// ... (fungsi beep, robotBicara, setLampuBca, showNotif tetap sama) ...
+// Fungsi saat halaman selesai dimuat
+window.onload = function() {
+    // Jalankan fungsi dashboard saja, jangan start kamera di sini
+    if (typeof muatDataDashboardAwal === 'function') {
+        muatDataDashboardAwal();
+    }
+};
 
-function muatDataDashboardAwal() {
-    fetch(`${APP_URL}?action=getDashboard`)
-    .then(res => res.json())
-    .then(data => { if(data.status === 'success') { document.getElementById('load-hari-ini').innerText = data.hariIni; document.getElementById('load-kemarin').innerText = data.kemarin; document.getElementById('load-minggu').innerText = data.mingguIni; } }).catch(e => {});
+// Event Listener untuk tombol aktivasi kamera
+document.getElementById('startBtn').addEventListener('click', function() {
+    startCamera();
+});
+
+function startCamera() {
+    const statusMessage = document.getElementById('status-message');
+    
+    // Pastikan instance kamera bersih sebelum memulai
+    if (html5QrCode) {
+        html5QrCode.stop().catch(err => console.log("Gagal menghentikan kamera sebelumnya"));
+    }
+
+    html5QrCode = new Html5Qrcode("reader");
+
+    const config = { 
+        fps: 10, 
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0 
+    };
+
+    html5QrCode.start(
+        { facingMode: "environment" }, // Paksa kamera belakang
+        config,
+        (decodedText) => {
+            // Berhasil Scan
+            handleScanSuccess(decodedText);
+        },
+        (errorMessage) => {
+            // Error scan (biasanya diabaikan karena terjadi setiap frame)
+        }
+    ).catch((err) => {
+        console.error("Error akses kamera: ", err);
+        alert("Gagal membuka kamera: " + err + ". Pastikan Anda menggunakan HTTPS.");
+    });
 }
 
-// ... (fungsi startCamera, saveResi, renderHistory, downloadOfflineData tetap sama) ...
+function handleScanSuccess(decodedText) {
+    // Tambahkan logika pemrosesan resi Anda di sini
+    console.log("Resi discan: " + decodedText);
+    
+    // Contoh: berikan feedback visual
+    document.getElementById('status-message').innerText = "Berhasil scan: " + decodedText;
+    
+    // Opsional: Stop kamera setelah scan berhasil
+    // html5QrCode.stop();
+}
